@@ -1,8 +1,4 @@
-#!/usr/bin/env python
 # coding: utf-8
-
-# In[1]:
-
 
 import requests
 import json
@@ -11,13 +7,14 @@ import pandas as pd
 import zipfile, io
 from os import listdir, getenv, mkdir
 import os
-from os.path import isfile, join
+from os.path import isfile, join, isdir
+
 
 def fetch_settings():
     """Get the input environment variables"""
     api_user = getenv('api_user')
     api_password = getenv('api_password')
-    print(api_user, api_password)
+    #print(api_user, api_password)
     return api_user, api_password
 
 # API credentials
@@ -26,11 +23,18 @@ api_username, api_password = fetch_settings()
 user_settings['user'] = api_username
 user_settings['password'] = api_password
 
-mkdir('/data')
-mkdir('/data/downloads')
-mkdir('/data/outputs')
-mkdir('/data/outputs/developed')
-mkdir('/data/outputs/developed_exroads')
+def mk_dir(path):
+    """"""
+    if isdir(path) is False:
+        mkdir(path)
+
+
+mk_dir('/data')
+mk_dir('/data/downloads')
+mk_dir('/data/outputs')
+mk_dir('/data/outputs/developed')
+mk_dir('/data/outputs/developed_exroads')
+mk_dir('/data/outputs/final')
 out_dir = '/data/downloads'
 
 area_codes = 'W06000012,'
@@ -51,6 +55,7 @@ zone_codes = list(gdf_zones['msoa_code'])
 scale = 'msoa'
 
 for zone_code in zone_codes:
+    print(zone_code)
     queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year=2017&classification_codes=all&make=Manmade&flatten_lists=true"
     response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
     print(response.status_code)
@@ -76,8 +81,24 @@ gdf = gdf.drop_duplicates()
 gdf = gdf.loc[gdf['make'].isin(['Manmade', 'Multiple'])]
 
 # generate layer of urban/developed surfaces
-gdf.to_file('data/outputs/developed/%s.shp' % area_codes[:-1])
+gdf.to_file('/data/outputs/developed/%s.gpkg' % area_codes[:-1], driver='GPKG')
 
 # generate layer excluding toads
 gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
-gdf_nr.to_file('data/outputs/developed_exroads/%s.shp' % area_codes[:-1])
+gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes[:-1], driver='GPKG')
+
+# loop through all the generated files and create a geodataframe
+data_files = [f for f in listdir(join('/data/outputs/developed_exroads')) if isfile(join('/data/outputs/developed_exroads', f))]
+print('Data files:', data_files)
+path = [os.path.join('/data/outputs/developed_exroads', i) for i in data_files if ".gpkg" in i]
+gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
+                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
+gdf.to_file('/data/outputs/final/developed_exroads.gpkg', driver='GPKG')
+
+# loop through all the generated files and create a geodataframe
+data_files = [f for f in listdir(join('/data/outputs/developed')) if isfile(join('/data/outputs/developed', f))]
+print('Data files:', data_files)
+path = [os.path.join('/data/outputs/developed', i) for i in data_files if ".gpkg" in i]
+gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
+                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
+gdf.to_file('/data/outputs/final/developed.gpkg', driver='GPKG')
