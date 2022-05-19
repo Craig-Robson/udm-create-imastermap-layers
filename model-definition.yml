@@ -1,0 +1,37 @@
+kind: Model
+api_version: v1beta1
+metadata:
+  display_name: ToolSet:MasterMap UDM Inputs
+  name: toolset-mastermap-udm-inputs
+  summary: A utility tool for generating the mastermap udm inputs
+  publisher: Newcastle University
+  source_code: https://github.com/Craig-Robson/udm-create-mastermap-layers
+  description: >
+    Generate UDM input layers from OS MasterMap using NISMOD-DB API. Creates a .gpkg for developed land and developed land excluding roads.
+spec:
+  inputs:
+    parameters:
+      - name: api_user
+        title: NISMOD-DB API username
+        description: Valid username for the NISMOD-DB API
+        type: string
+        required: true
+        default: 'None'
+      - name: api_password
+        title: NISMOD-DB API password
+        type: string
+        description: Password associated with user for NISMOD-DB API
+        default: 'None'
+        required: true
+      - name: area_codes
+        title: Local Authority codes
+        type: string
+        description: List of Local Authority area codes (from 2011) to fetch data for.
+        default: 'E08000021;'
+        required: false
+
+  outputs:
+    datasets:
+      - name: outputs/final/*.gpkg
+        type: folder
+        description: geopackage outputs
