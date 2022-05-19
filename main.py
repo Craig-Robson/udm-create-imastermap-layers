@@ -79,7 +79,6 @@ for area_codes in area_code_list:
         print(response.status_code)
         z = zipfile.ZipFile(io.BytesIO(response.content))
         z.extractall(join(out_dir, area_codes[:-1]))
-        break
 
 
     # get list of files downloaded from API
