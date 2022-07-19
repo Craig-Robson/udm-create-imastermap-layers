@@ -23,6 +23,12 @@ api_username, api_password = fetch_settings()
 user_settings['user'] = api_username
 user_settings['password'] = api_password
 
+# get area code scale (lad/gor)
+area_code_type = getenv('area_code_type')
+if area_code_type.lower() not in ['lad','gor']:
+    print('bad area code type passed')
+    exit()
+
 # get list of area codes to run for - must be LAD codes
 area_code_list = getenv('area_codes')
 area_code_list = area_code_list.split(';')
@@ -56,6 +62,26 @@ for area_codes in area_code_list:
     if area_codes == '':
         break
     print(area_codes)
+    zone_codes_lads = []
+
+    if area_code_type.lower() == 'gor':
+        queryText = f"https://www.nismod.ac.uk/api/data/boundaries/lads_in_gor?export_format=geojson&gor_codes={area_codes}"
+        print(queryText)
+        response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
+        if response.status_code != 200:
+            print('API call for fetch LAD list failed! Response: ', response.status_code)
+        area_zones = json.loads(response.text)
+        gdf_zones = gpd.GeoDataFrame.from_features(area_zones["features"])
+        zone_codes_lads.append(list(gdf_zones['lad_codes']))
+
+if area_code_type.lower() == 'gor':
+    area_codes_list = zone_codes_lads
+
+
+for area_codes in area_codes_list:
+    if area_codes = '':
+        break
+
     queryText = f"https://www.nismod.ac.uk/api/data/boundaries/msoas_in_lad?export_format=geojson&area_codes={area_codes}"
     print(queryText)
     response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)

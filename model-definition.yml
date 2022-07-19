@@ -23,6 +23,12 @@ spec:
         description: Password associated with user for NISMOD-DB API
         default: 'None'
         required: true
+      - name: area_code_type
+        title: Area code type
+        type: string
+        description: The type of area codes passed. LAD or GOR.
+        default: 'LAD'
+        reuired: true
       - name: area_codes
         title: Local Authority codes
         type: string
