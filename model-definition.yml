@@ -30,10 +30,10 @@ spec:
         default: 'LAD'
         required: true
         options:
-          - name:'LAD'
-            title:'LAD'
-          - name:'GOR'
-            title:'GOR'
+          - name: LAD
+            title: LAD
+          - name: GOR
+            title: GOR
       - name: area_codes
         title: Local Authority codes
         type: string
