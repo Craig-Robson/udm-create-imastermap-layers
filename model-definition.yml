@@ -33,7 +33,7 @@ spec:
           - name:'LAD'
             title:'LAD'
           - name:'GOR'
-            title:'GOR
+            title:'GOR'
       - name: area_codes
         title: Local Authority codes
         type: string
