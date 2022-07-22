@@ -8,6 +8,7 @@ import zipfile, io
 from os import listdir, getenv, mkdir, remove
 import os
 from os.path import isfile, join, isdir
+import subprocess
 
 
 def fetch_settings():
@@ -135,18 +136,11 @@ for area_codes in area_codes_list:
     gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
     gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes, driver='GPKG')
 
-# loop through all the generated files and create a geodataframe
-data_files = [f for f in listdir(join('/data/outputs/developed_exroads')) if isfile(join('/data/outputs/developed_exroads', f))]
-print('Data files:', data_files)
-path = [os.path.join('/data/outputs/developed_exroads', i) for i in data_files if ".gpkg" in i]
-gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
-                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
-gdf.to_file('/data/outputs/final/developed_exroads.gpkg', driver='GPKG')
+# create developed areas gpkg
+command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
+subprocess.call(command, shell=True)
 
-# loop through all the generated files and create a geodataframe
-data_files = [f for f in listdir(join('/data/outputs/developed')) if isfile(join('/data/outputs/developed', f))]
-print('Data files:', data_files)
-path = [os.path.join('/data/outputs/developed', i) for i in data_files if ".gpkg" in i]
-gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
-#                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
-#gdf.to_file('/data/outputs/final/developed.gpkg', driver='GPKG')
+
+# create developed areas excluding roads
+command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
+subprocess.call(command, shell=True)
