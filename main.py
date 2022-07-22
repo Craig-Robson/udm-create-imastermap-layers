@@ -72,14 +72,14 @@ for area_codes in area_code_list:
             print('API call for fetch LAD list failed! Response: ', response.status_code)
         area_zones = json.loads(response.text)
         gdf_zones = gpd.GeoDataFrame.from_features(area_zones["features"])
-        zone_codes_lads.append(list(gdf_zones['lad_codes']))
+        zone_codes_lads.extend(list(gdf_zones['lad_code']))
 
 if area_code_type.lower() == 'gor':
     area_codes_list = zone_codes_lads
-
-
+print(area_codes_list)
 for area_codes in area_codes_list:
-    if area_codes = '':
+    print(area_codes)
+    if area_codes == '':
         break
 
     queryText = f"https://www.nismod.ac.uk/api/data/boundaries/msoas_in_lad?export_format=geojson&area_codes={area_codes}"
@@ -91,7 +91,7 @@ for area_codes in area_codes_list:
     # load msoa/zone data into geodataframe
     area_zones = json.loads(response.text)
     gdf_zones = gpd.GeoDataFrame.from_features(area_zones["features"])
-
+    print(gdf_zones.columns)
     zone_codes = list(gdf_zones['msoa_code'])
 
 
@@ -104,18 +104,23 @@ for area_codes in area_codes_list:
         response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
         print(response.status_code)
         z = zipfile.ZipFile(io.BytesIO(response.content))
-        z.extractall(join(out_dir, area_codes[:-1]))
+        z.extractall(join(out_dir, area_codes))
 
+        queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year=2017&classification_codes=all&make=Multiple&flatten_lists=true"
+        response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
+        print(response.status_code)
+        z = zipfile.ZipFile(io.BytesIO(response.content))
+        z.extractall(join(out_dir, area_codes))
 
     # get list of files downloaded from API
-    data_files = [f for f in listdir(join(out_dir, area_codes[:-1])) if isfile(join(out_dir, area_codes[:-1], f))]
+    data_files = [f for f in listdir(join(out_dir, area_codes)) if isfile(join(out_dir, area_codes, f))]
 
     # for testing only
-    #gdf = gpd.read_file(join(out_dir, area_codes[:-1], data_files[1]))
+    #gdf = gpd.read_file(join(out_dir, area_codes, data_files[1]))
     #gdf.head()
 
     # loop through all downloaded geojson files and create a geodataframe
-    path = [os.path.join(out_dir, area_codes[:-1], i) for i in data_files if ".geojson" in i]
+    path = [os.path.join(out_dir, area_codes, i) for i in data_files if ".geojson" in i]
     gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
                                      ignore_index=True), crs=gpd.read_file(path[0]).crs)
 
@@ -126,7 +131,7 @@ for area_codes in area_codes_list:
     # generate layer of urban/developed surfaces
     gdf.to_file('/data/outputs/developed/%s.gpkg' % area_codes, driver='GPKG')
 
-    # generate layer excluding toads
+    # generate layer excluding roads
     gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
     gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes, driver='GPKG')
 
@@ -143,5 +148,5 @@ data_files = [f for f in listdir(join('/data/outputs/developed')) if isfile(join
 print('Data files:', data_files)
 path = [os.path.join('/data/outputs/developed', i) for i in data_files if ".gpkg" in i]
 gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path],
-                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
-gdf.to_file('/data/outputs/final/developed.gpkg', driver='GPKG')
+#                                 ignore_index=True), crs=gpd.read_file(path[0]).crs)
+#gdf.to_file('/data/outputs/final/developed.gpkg', driver='GPKG')

@@ -28,7 +28,12 @@ spec:
         type: string
         description: The type of area codes passed. LAD or GOR.
         default: 'LAD'
-        reuired: true
+        required: true
+        options:
+          - name:'LAD'
+            title:'LAD'
+          - name:'GOR'
+            title:'GOR
       - name: area_codes
         title: Local Authority codes
         type: string
