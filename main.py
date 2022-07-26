@@ -49,15 +49,19 @@ print('Run developed ex roads:', run_developed_ex_roads)
 try:
     test = getenv('test')
 except:
+    test = 'false'
+print(test)
+if test is None:
     test = False
 
-if test.lower() == 'false':
-    test = False
-elif test.lower() == 'true':
-    test = True
-    print('Going to run in test mode')
-else:
-    test = False
+if type(test) is not bool:
+    if test.lower() == 'false':
+        test = False
+    elif test.lower() == 'true':
+        test = True
+        print('Going to run in test mode')
+    else:
+        test = False
 
 print('TEST is:', test)
 
