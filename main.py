@@ -46,7 +46,11 @@ else:
 print('Run developed ex roads:', run_developed_ex_roads)
 
 # get value of test flag
-test = getenv('test')
+try:
+    test = getenv('test')
+except:
+    test = False
+
 if test.lower() == 'false':
     test = False
 elif test.lower() == 'true':
