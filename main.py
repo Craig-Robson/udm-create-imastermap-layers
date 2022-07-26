@@ -35,7 +35,7 @@ area_code_list = getenv('area_codes')
 area_code_list = area_code_list.split(';')
 
 # include developed excluding roads
-run_developed_ex_roads = getenv('')
+run_developed_ex_roads = getenv('run_developed_ex_roads')
 if run_developed_ex_roads.lower == 'false':
     run_developed_ex_roads = False
 elif run_developed_ex_roads.lower == 'true':
@@ -85,9 +85,9 @@ for area_codes in area_code_list:
         zone_codes_lads.extend(list(gdf_zones['lad_code']))
 
 if area_code_type.lower() == 'gor':
-    area_codes_list = zone_codes_lads
-print(area_codes_list)
-for area_codes in area_codes_list:
+    area_code_list = zone_codes_lads
+print(area_code_list)
+for area_codes in area_code_list:
     print(area_codes)
     if area_codes == '':
         break
