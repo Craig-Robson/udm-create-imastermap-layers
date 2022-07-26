@@ -40,8 +40,20 @@ if run_developed_ex_roads.lower == 'false':
     run_developed_ex_roads = False
 elif run_developed_ex_roads.lower == 'true':
     run_developed_ex_roads = True
+else:
+    run_developed_ex_roads = False
 
 print('Run developed ex roads:', run_developed_ex_roads)
+
+# get value of test flag
+test = getenv('test')
+if test.lower == 'false':
+    test = False
+elif test.lower == 'true':
+    test = True
+    print('Going to run in test mode')
+else:
+    test = False
 
 def mk_dir(path):
     """"""
@@ -122,6 +134,9 @@ for area_codes in area_code_list:
         z = zipfile.ZipFile(io.BytesIO(response.content))
         z.extractall(join(out_dir, area_codes))
 
+        # if in test mode stop here
+        if test: break
+
     # get list of files downloaded from API
     data_files = [f for f in listdir(join(out_dir, area_codes)) if isfile(join(out_dir, area_codes, f))]
 
@@ -145,6 +160,9 @@ for area_codes in area_code_list:
     if run_developed_ex_roads is True:
         gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
         gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes, driver='GPKG')
+
+    # if in test mode, stop here
+    if test: break
 
 # create developed areas gpkg
 command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"

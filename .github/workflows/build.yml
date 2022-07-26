@@ -13,4 +13,4 @@ jobs:
         run: docker build . -t udm-mm-inputs
 
       - name: Test
-        run: docker run -v $PWD/data:/data --env api_user=${{ secrets.NISMOD_API_USERNAME }} --env api_password=${{ secrets.NISMOD_API_PASSWORD }} --env area_codes='E08000021;' --env area_code_type='lad' --env run_developed_ex_roads=false -t udm-mm-inputs
+        run: docker run -v $PWD/data:/data --env api_user=${{ secrets.NISMOD_API_USERNAME }} --env api_password=${{ secrets.NISMOD_API_PASSWORD }} --env area_codes='E08000021;' --env area_code_type='lad' --env test=true --env run_developed_ex_roads=false -t udm-mm-inputs
