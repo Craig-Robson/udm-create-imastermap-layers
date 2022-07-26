@@ -34,6 +34,12 @@ spec:
             title:'LAD'
           - name:'GOR'
             title:'GOR
+      - name: run_developed_ex_roads
+        title: Run for developed excluding roads
+        type: boolean
+        description: If to output developed land excluding roads
+        required: true 
+        default: False
       - name: area_codes
         title: Local Authority codes
         type: string

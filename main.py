@@ -34,6 +34,15 @@ if area_code_type.lower() not in ['lad','gor']:
 area_code_list = getenv('area_codes')
 area_code_list = area_code_list.split(';')
 
+# include developed excluding roads
+run_developed_ex_roads = getenv('')
+if run_developed_ex_roads.lower == 'false':
+    run_developed_ex_roads = False
+elif run_developed_ex_roads.lower == 'true':
+    run_developed_ex_roads = True
+
+print('Run developed ex roads:', run_developed_ex_roads)
+
 def mk_dir(path):
     """"""
     if isdir(path) is False:
@@ -133,8 +142,9 @@ for area_codes in area_codes_list:
     gdf.to_file('/data/outputs/developed/%s.gpkg' % area_codes, driver='GPKG')
 
     # generate layer excluding roads
-    gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
-    gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes, driver='GPKG')
+    if run_developed_ex_roads is True:
+        gdf_nr = gdf[~gdf.theme.str.contains('Roads Tracks And Paths')]
+        gdf_nr.to_file('/data/outputs/developed_exroads/%s.gpkg' % area_codes, driver='GPKG')
 
 # create developed areas gpkg
 command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
@@ -142,5 +152,6 @@ subprocess.call(command, shell=True)
 
 
 # create developed areas excluding roads
-command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
-subprocess.call(command, shell=True)
+if run_developed_ex_roads is True:
+    command = "sudo ogrmerge.py -single -o /data/outputs/developed_exroads/*.gpkg -f GPKG -o /data/outputs/final/developed_exroads.gpkg -overwrite_ds -progress"
+    subprocess.call(command, shell=True)
