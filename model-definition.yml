@@ -33,7 +33,7 @@ spec:
           - name: LAD
             title: LAD
           - name: GOR
-            time: GOR 
+            title: GOR
       - name: run_developed_ex_roads
         title: Run for developed excluding roads
         type: boolean
