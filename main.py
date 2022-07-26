@@ -47,13 +47,15 @@ print('Run developed ex roads:', run_developed_ex_roads)
 
 # get value of test flag
 test = getenv('test')
-if test.lower == 'false':
+if test.lower() == 'false':
     test = False
-elif test.lower == 'true':
+elif test.lower() == 'true':
     test = True
     print('Going to run in test mode')
 else:
     test = False
+
+print('TEST is:', test)
 
 def mk_dir(path):
     """"""
@@ -119,6 +121,7 @@ for area_codes in area_code_list:
 
     ## fetch topo polygons from NISMOD-DB
     scale = 'msoa'
+    j = 0
 
     for zone_code in zone_codes:
         print(zone_code)
@@ -135,10 +138,12 @@ for area_codes in area_code_list:
         z.extractall(join(out_dir, area_codes))
 
         # if in test mode stop here
-        if test: break
+        j += 1
+        if test and j == 2: break
 
     # get list of files downloaded from API
     data_files = [f for f in listdir(join(out_dir, area_codes)) if isfile(join(out_dir, area_codes, f))]
+    print('Downloaded files:', len(data_files))
 
     # for testing only
     #gdf = gpd.read_file(join(out_dir, area_codes, data_files[1]))
@@ -164,12 +169,19 @@ for area_codes in area_code_list:
     # if in test mode, stop here
     if test: break
 
-# create developed areas gpkg
-command = "sudo ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
-subprocess.call(command, shell=True)
+print('Run merge process')
 
+# check files available to merge
+data_files = [f for f in listdir('/data/outputs/developed') if isfile(join('/data/outputs/developed', f))]
+print('Downloaded files:', len(data_files))
+print(data_files)
+
+# create developed areas gpkg
+command = "ogrmerge.py -single -o /data/outputs/developed/*.gpkg -f GPKG -o /data/outputs/final/developed.gpkg -overwrite_ds -progress"
+subprocess.call(command, shell=True)
 
 # create developed areas excluding roads
 if run_developed_ex_roads is True:
-    command = "sudo ogrmerge.py -single -o /data/outputs/developed_exroads/*.gpkg -f GPKG -o /data/outputs/final/developed_exroads.gpkg -overwrite_ds -progress"
+    print('Running merge process for excluding roads layer')
+    command = "ogrmerge.py -single -o /data/outputs/developed_exroads/*.gpkg -f GPKG -o /data/outputs/final/developed_exroads.gpkg -overwrite_ds -progress"
     subprocess.call(command, shell=True)
