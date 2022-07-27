@@ -48,6 +48,7 @@ spec:
         required: false
       - name: year
         title: Year
+        description: The year of the data to be used to generate the layer(s)
         type: number
         required: true
         options:
