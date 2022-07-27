@@ -46,6 +46,17 @@ spec:
         description: List of Local Authority area codes (from 2011) to fetch data for.
         default: 'E08000021;'
         required: false
+      - name: year
+        title: Year
+        type: number
+        required: true
+        options:
+          - name: 2017
+            title: 2017
+          - name: 2011
+            title: 2011
+          - name: 2020
+            title: 2020
 
   outputs:
     datasets:

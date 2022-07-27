@@ -45,6 +45,15 @@ else:
 
 print('Run developed ex roads:', run_developed_ex_roads)
 
+# get year of mastermap data to use
+year = getenv('year')
+if year is None:
+    # set a default year to 2017
+    year = 2017
+    print('Using a default year of 2017')
+
+print('YEAR IS:', year)
+
 # get value of test flag
 try:
     test = getenv('test')
@@ -133,13 +142,13 @@ for area_codes in area_code_list:
 
     for zone_code in zone_codes:
         print(zone_code)
-        queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year=2017&classification_codes=all&make=Manmade&flatten_lists=true"
+        queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year={year}&classification_codes=all&make=Manmade&flatten_lists=true"
         response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
         print(response.status_code)
         z = zipfile.ZipFile(io.BytesIO(response.content))
         z.extractall(join(out_dir, area_codes))
 
-        queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year=2017&classification_codes=all&make=Multiple&flatten_lists=true"
+        queryText = f"https://www.nismod.ac.uk/api/data/mastermap/areas?export_format=geojson-zip&geom_format=geojson&scale={scale}&area_codes={zone_code}&year={year}&classification_codes=all&make=Multiple&flatten_lists=true"
         response = requests.get(queryText, auth=(user_settings['user'], user_settings['password']), verify=False)
         print(response.status_code)
         z = zipfile.ZipFile(io.BytesIO(response.content))
